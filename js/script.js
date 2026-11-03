@@ -214,11 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
       span.className = 'char untyped';
       span.dataset.index = String(i);
 
+      span.textContent = char;
       if (char === ' ') {
         span.classList.add('char-space');
-        span.innerHTML = '&nbsp;';
-      } else {
-        span.textContent = char;
       }
 
       // First character gets active cursor

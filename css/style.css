@@ -116,6 +116,8 @@ a:focus-visible {
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .content-container {
@@ -123,6 +125,8 @@ a:focus-visible {
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: 0 1.5rem;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -259,6 +263,10 @@ a:focus-visible {
 .main-content {
   flex: 1;
   padding: 2.5rem 0 3.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .welcome-section {
@@ -416,6 +424,10 @@ a:focus-visible {
   margin-bottom: 2.5rem;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .preview-header {
@@ -425,6 +437,10 @@ a:focus-visible {
   margin-bottom: 1.25rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid var(--color-border-subtle);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .preview-status {
@@ -465,6 +481,11 @@ a:focus-visible {
   margin-bottom: 1.5rem;
   transition: border-color var(--transition-normal);
   cursor: text;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .typing-canvas:focus-within,
@@ -497,6 +518,12 @@ a:focus-visible {
   font-family: var(--font-mono);
   font-size: 1.25rem;
   line-height: 1.75;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
 /* Canvas focus lost overlay */
@@ -548,6 +575,12 @@ a:focus-visible {
   position: relative;
   z-index: 2;
   min-height: 6rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
 /* --------------------------------------------------------------------------
@@ -555,6 +588,10 @@ a:focus-visible {
    -------------------------------------------------------------------------- */
 .char {
   display: inline;
+  position: relative;
+  box-sizing: border-box;
+  transition: color 50ms ease-out, background-color 50ms ease-out;
+}
   position: relative;
   transition: color 50ms ease-out, background-color 50ms ease-out;
 }
@@ -1321,6 +1358,20 @@ a:focus-visible {
 
   .stats-preview-container {
     grid-template-columns: 1fr;
+  }
+
+  .preview-section {
+    padding: 1.25rem 1rem;
+  }
+
+  .typing-canvas {
+    padding: 1.2rem 1rem;
+  }
+
+  .typing-hidden-input {
+    padding: 1.2rem 1rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
   }
 
   .monospace-sample {
