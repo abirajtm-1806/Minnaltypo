@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINNALTYPING — Speed Test & Arcade Typing</title>
+  <meta name="description" content="A lightweight, arcade-inspired typing speed test and practice tool. Built for speed, powered by practice.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Main Application Wrapper -->
+  <div class="app-shell">
+
+    <!-- ================================================================= -->
+    <!-- HEADER SECTION                                                    -->
+    <!-- ================================================================= -->
+    <header class="site-header" role="banner">
+      <div class="header-container">
+        <!-- Brand Logo -->
+        <a href="#home" class="brand-logo" aria-label="MINNALTYPING Home">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="currentColor"/>
+          </svg>
+          <span class="logo-text">MINNAL<span class="logo-accent">TYPING</span></span>
+        </a>
+
+        <!-- Navigation Links -->
+        <nav class="main-nav" aria-label="Primary Navigation">
+          <ul class="nav-list">
+            <li><a href="#home" class="nav-link is-active" id="nav-home">Home</a></li>
+            <li><a href="#practice" class="nav-link" id="nav-practice">Practice</a></li>
+            <li><a href="#about" class="nav-link" id="nav-about">About</a></li>
+          </ul>
+        </nav>
+
+        <!-- Quick Action Controls -->
+        <div class="header-actions">
+          <!-- Sound Toggle Button -->
+          <button type="button" class="icon-btn" id="sound-toggle" aria-label="Toggle sound effects" aria-pressed="true" title="Sound: Enabled">
+            <!-- Unmuted Icon -->
+            <svg class="icon icon-sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>
+            <!-- Muted Icon (Hidden by default) -->
+            <svg class="icon icon-sound-off is-hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+              <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+              <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+
+          <!-- Settings Button -->
+          <button type="button" class="icon-btn" id="settings-toggle" aria-label="Open settings" title="Settings">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ================================================================= -->
+    <!-- MAIN CONTENT                                                      -->
+    <!-- ================================================================= -->
+    <main class="main-content" id="main-content">
+      <div class="content-container">
+
+        <!-- Welcome & Hero Section -->
+        <section class="welcome-section" aria-labelledby="welcome-title">
+          <div class="badge-pill">
+            <span class="badge-indicator"></span>
+            <span>PHASE 1 • FOUNDATION</span>
+          </div>
+          <h1 id="welcome-title" class="welcome-heading">
+            Speed. Rhythm. Precision.
+          </h1>
+          <p class="welcome-subtitle">Every keystroke makes you faster.</p>
+        </section>
+
+        <!-- Controls Toolbar: Difficulty & Timer Selectors + Action -->
+        <section class="controls-card" aria-label="Typing test configuration">
+          <div class="controls-layout">
+
+            <!-- Difficulty Selector -->
+            <div class="control-group" role="group" aria-labelledby="difficulty-label">
+              <span id="difficulty-label" class="control-label">Difficulty</span>
+              <div class="segmented-control" role="radiogroup" aria-labelledby="difficulty-label">
+                <button type="button" class="segment-btn" data-difficulty="easy" role="radio" aria-checked="false">
+                  Easy
+                </button>
+                <button type="button" class="segment-btn is-active" data-difficulty="medium" role="radio" aria-checked="true">
+                  Medium
+                </button>
+                <button type="button" class="segment-btn" data-difficulty="hard" role="radio" aria-checked="false">
+                  Hard
+                </button>
+              </div>
+            </div>
+
+            <!-- Timer Selector -->
+            <div class="control-group" role="group" aria-labelledby="timer-label">
+              <span id="timer-label" class="control-label">Timer</span>
+              <div class="segmented-control" role="radiogroup" aria-labelledby="timer-label">
+                <button type="button" class="segment-btn" data-time="15" role="radio" aria-checked="false">
+                  15s
+                </button>
+                <button type="button" class="segment-btn" data-time="30" role="radio" aria-checked="false">
+                  30s
+                </button>
+                <button type="button" class="segment-btn is-active" data-time="60" role="radio" aria-checked="true">
+                  60s
+                </button>
+                <button type="button" class="segment-btn" data-time="120" role="radio" aria-checked="false">
+                  120s
+                </button>
+              </div>
+            </div>
+
+            <!-- Start Typing Action Button -->
+            <div class="action-group">
+              <button type="button" id="start-btn" class="btn-start" aria-label="Start typing test">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span>Start Typing</span>
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- PREVIEW SECTION                                               -->
+        <!-- ============================================================= -->
+        <section class="preview-section" id="preview-section" aria-labelledby="preview-heading">
+          <div class="preview-header">
+            <div class="preview-status">
+              <span class="status-indicator"></span>
+              <span id="preview-heading" class="preview-heading-text">Preview Canvas</span>
+            </div>
+            <div class="preview-tag">
+              Selected: <strong id="preview-current-config">Medium • 60s</strong>
+            </div>
+          </div>
+
+          <!-- Sample Paragraph Container -->
+          <div class="typing-canvas" tabindex="0" role="region" aria-label="Typing sample preview">
+            <div class="canvas-glow"></div>
+            <p class="monospace-sample" id="sample-paragraph">
+              Speed is a byproduct of precision and rhythm. When fingers glide across the keys with quiet confidence, words form seamlessly on the screen. True typing mastery is not about rushing—it is about striking each key cleanly, maintaining steady momentum, and letting practice sharpen your natural reflexes into lightning speed.
+            </p>
+          </div>
+
+          <!-- Typing Statistics Preview Bar -->
+          <div class="stats-preview-container" aria-label="Typing statistics preview">
+            <div class="stat-card">
+              <span class="stat-tag">METRIC</span>
+              <span class="stat-title">WPM</span>
+              <span class="stat-value" id="preview-wpm">—</span>
+              <span class="stat-caption">Words per minute</span>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-tag">METRIC</span>
+              <span class="stat-title">ACCURACY</span>
+              <span class="stat-value" id="preview-accuracy">—%</span>
+              <span class="stat-caption">Precision percentage</span>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-tag">TARGET</span>
+              <span class="stat-title">TIME</span>
+              <span class="stat-value" id="preview-time">60s</span>
+              <span class="stat-caption">Selected duration</span>
+            </div>
+          </div>
+
+          <!-- Preview Notice (Clarifies that stats are not fake user results) -->
+          <p class="preview-disclaimer">
+            <svg class="disclaimer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>Static interface preview. Live typing engine, metrics calculation, and arcade sound feedback activate in Phase 2.</span>
+          </p>
+        </section>
+
+        <!-- Informational / Feature Pillars (Lightweight arcade cards) -->
+        <section class="features-grid" aria-label="Core features">
+          <div class="feature-card">
+            <div class="feature-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline>
+              </svg>
+            </div>
+            <h3 class="feature-title">Arcade Reflexes</h3>
+            <p class="feature-desc">Engineered for immediate tactile and visual responses to accelerate your subconscious muscle memory.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+              </svg>
+            </div>
+            <h3 class="feature-title">True WPM Telemetry</h3>
+            <p class="feature-desc">Raw keystroke analysis, real-time error tracing, and consistency benchmarking with zero bloat.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+            </div>
+            <h3 class="feature-title">Zero Overhead</h3>
+            <p class="feature-desc">Pure HTML, CSS, and vanilla JavaScript designed to run smoothly on any hardware, including Intel Core i3 systems.</p>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- SETTINGS MODAL DIALOG (Lightweight Vanilla Overlay)               -->
+    <!-- ================================================================= -->
+    <div class="modal-backdrop is-hidden" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 id="settings-title" class="modal-title">Settings</h2>
+          <button type="button" class="modal-close-btn" id="settings-close" aria-label="Close settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-lead">Customization options will be unlocked in Phase 2:</p>
+          <ul class="settings-list">
+            <li><span>Sound Pack selection (Mechanical, Soft, Arcade)</span> <span class="badge-pending">Phase 2</span></li>
+            <li><span>Theme accent switcher (Lime, Cyan, Amber)</span> <span class="badge-pending">Phase 2</span></li>
+            <li><span>Caret style (Line, Block, Underline)</span> <span class="badge-pending">Phase 2</span></li>
+            <li><span>Font size & letter spacing adjustment</span> <span class="badge-pending">Phase 2</span></li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="settings-ok">Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- ABOUT MODAL DIALOG                                                -->
+    <!-- ================================================================= -->
+    <div class="modal-backdrop is-hidden" id="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-title">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 id="about-title" class="modal-title">About MINNALTYPING</h2>
+          <button type="button" class="modal-close-btn" id="about-close" aria-label="Close about dialog">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-text"><strong>MINNALTYPING</strong> is an arcade-inspired typing speed platform built for pure performance and zero latency.</p>
+          <p class="modal-text">Named after <em>Minnal</em> (lightning), it delivers lightning-fast feedback on minimal hardware resources without framework bloat.</p>
+          <div class="hardware-specs-card">
+            <h4>System Compatibility</h4>
+            <p>Optimized for low-spec systems (including Intel Core i3), zero external dependencies, 100% offline-ready.</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="about-ok">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- FOOTER SECTION                                                    -->
+    <!-- ================================================================= -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="footer-container">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <div class="footer-logo">
+              <svg class="logo-icon-small" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="currentColor"/>
+              </svg>
+              <span>MINNALTYPING</span>
+            </div>
+            <p class="footer-tagline">Built for speed. Powered by practice.</p>
+          </div>
+          <div class="footer-nav">
+            <a href="#home">Home</a>
+            <a href="#practice">Practice</a>
+            <a href="#about" id="footer-about-link">About</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p class="footer-copy">&copy; 2026 MINNALTYPING. Pure HTML5, CSS3, &amp; Vanilla JavaScript.</p>
+          <p class="footer-meta-tag">Phase 1: Architecture &amp; UI Foundation</p>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- JavaScript Link -->
+  <script src="js/script.js"></script>
+</body>
+</html>
+
