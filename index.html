@@ -72,10 +72,10 @@
       <div class="content-container">
 
         <!-- Welcome & Hero Section -->
-        <section class="welcome-section" aria-labelledby="welcome-title">
+        <section class="welcome-section" id="welcome-section" aria-labelledby="welcome-title">
           <div class="badge-pill">
             <span class="badge-indicator"></span>
-            <span>PHASE 1 • FOUNDATION</span>
+            <span>PHASE 2 • LIVE ENGINE</span>
           </div>
           <h1 id="welcome-title" class="welcome-heading">
             Speed. Rhythm. Precision.
@@ -84,7 +84,7 @@
         </section>
 
         <!-- Controls Toolbar: Difficulty & Timer Selectors + Action -->
-        <section class="controls-card" aria-label="Typing test configuration">
+        <section class="controls-card" id="controls-section" aria-label="Typing test configuration">
           <div class="controls-layout">
 
             <!-- Difficulty Selector -->
@@ -135,62 +135,197 @@
           </div>
         </section>
 
+        <!-- Test Mode Heads-Up Display (HUD) - Displayed when test is active -->
+        <div class="test-hud is-hidden" id="test-hud" aria-label="Live typing session status">
+          <div class="hud-left">
+            <div class="hud-timer-badge">
+              <svg class="hud-timer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span class="hud-timer-label">Time Remaining:</span>
+              <span class="hud-timer-val" id="hud-timer-countdown">60s</span>
+            </div>
+            <div class="hud-badge-pill">
+              <span class="badge-indicator"></span>
+              <span id="hud-difficulty-badge">MEDIUM</span>
+            </div>
+          </div>
+          <div class="hud-right">
+            <button type="button" class="btn-hud" id="btn-hud-restart" title="Restart with a new paragraph (Esc)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M23 4v6h-6"></path>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+              <span>Restart (Esc)</span>
+            </button>
+            <button type="button" class="btn-hud btn-hud-secondary" id="btn-hud-config" title="Return to difficulty & timer settings">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+              <span>Settings</span>
+            </button>
+          </div>
+        </div>
+
         <!-- ============================================================= -->
-        <!-- PREVIEW SECTION                                               -->
+        <!-- TYPING / PREVIEW SECTION                                      -->
         <!-- ============================================================= -->
         <section class="preview-section" id="preview-section" aria-labelledby="preview-heading">
           <div class="preview-header">
             <div class="preview-status">
-              <span class="status-indicator"></span>
+              <span class="status-indicator" id="status-indicator-dot"></span>
               <span id="preview-heading" class="preview-heading-text">Preview Canvas</span>
             </div>
             <div class="preview-tag">
-              Selected: <strong id="preview-current-config">Medium • 60s</strong>
+              <span id="preview-status-desc">Selected:</span> <strong id="preview-current-config">Medium • 60s</strong>
+            </div>
+          </div>
+
+          <!-- Live Progress Indicator -->
+          <div class="test-progress-bar-container is-hidden" id="test-progress-container">
+            <div class="progress-bar-meta">
+              <span class="progress-bar-title">Paragraph Completion</span>
+              <span class="progress-bar-val" id="progress-bar-val">0%</span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%;"></div>
             </div>
           </div>
 
           <!-- Sample Paragraph Container -->
-          <div class="typing-canvas" tabindex="0" role="region" aria-label="Typing sample preview">
+          <div class="typing-canvas" id="typing-canvas" tabindex="0" role="region" aria-label="Typing test canvas">
             <div class="canvas-glow"></div>
-            <p class="monospace-sample" id="sample-paragraph">
+
+            <!-- Accessible hidden input supporting physical & touchscreen keyboards -->
+            <textarea id="typing-input" class="typing-hidden-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-gramm="false" aria-label="Typing test input" disabled></textarea>
+
+            <!-- Focus Lost Banner -->
+            <div class="canvas-focus-overlay is-hidden" id="canvas-focus-overlay" aria-hidden="true">
+              <div class="focus-overlay-pill">
+                <span class="focus-overlay-dot"></span>
+                <span>Click or tap to focus and resume typing</span>
+              </div>
+            </div>
+
+            <!-- Monospace Character Render Area -->
+            <div class="monospace-sample" id="sample-paragraph" aria-live="polite">
               Speed is a byproduct of precision and rhythm. When fingers glide across the keys with quiet confidence, words form seamlessly on the screen. True typing mastery is not about rushing—it is about striking each key cleanly, maintaining steady momentum, and letting practice sharpen your natural reflexes into lightning speed.
-            </p>
+            </div>
           </div>
 
-          <!-- Typing Statistics Preview Bar -->
-          <div class="stats-preview-container" aria-label="Typing statistics preview">
+          <!-- Live Character Telemetry Counters (Section 4) -->
+          <div class="character-telemetry-bar is-hidden" id="character-telemetry" aria-label="Character telemetry counters">
+            <div class="telemetry-item">
+              <span class="telemetry-label">Typed</span>
+              <span class="telemetry-value" id="counter-typed">0</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">Correct</span>
+              <span class="telemetry-value text-accent" id="counter-correct">0</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">Incorrect</span>
+              <span class="telemetry-value text-error" id="counter-incorrect">0</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">Remaining</span>
+              <span class="telemetry-value" id="counter-remaining">0</span>
+            </div>
+          </div>
+
+          <!-- Typing Statistics Bar -->
+          <div class="stats-preview-container" aria-label="Typing statistics">
             <div class="stat-card">
-              <span class="stat-tag">METRIC</span>
+              <span class="stat-tag" id="stat-wpm-tag">METRIC</span>
               <span class="stat-title">WPM</span>
               <span class="stat-value" id="preview-wpm">—</span>
-              <span class="stat-caption">Words per minute</span>
+              <span class="stat-caption" id="stat-wpm-caption">Words per minute</span>
             </div>
 
             <div class="stat-card">
-              <span class="stat-tag">METRIC</span>
+              <span class="stat-tag" id="stat-acc-tag">METRIC</span>
               <span class="stat-title">ACCURACY</span>
               <span class="stat-value" id="preview-accuracy">—%</span>
-              <span class="stat-caption">Precision percentage</span>
+              <span class="stat-caption" id="stat-acc-caption">Precision percentage</span>
             </div>
 
             <div class="stat-card">
-              <span class="stat-tag">TARGET</span>
+              <span class="stat-tag" id="stat-time-tag">TARGET</span>
               <span class="stat-title">TIME</span>
               <span class="stat-value" id="preview-time">60s</span>
-              <span class="stat-caption">Selected duration</span>
+              <span class="stat-caption" id="stat-time-caption">Selected duration</span>
             </div>
           </div>
 
-          <!-- Preview Notice (Clarifies that stats are not fake user results) -->
-          <p class="preview-disclaimer">
+          <!-- Preview / Test Notice -->
+          <p class="preview-disclaimer" id="preview-disclaimer">
             <svg class="disclaimer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="16" x2="12" y2="12"></line>
               <line x1="12" y1="8" x2="12.01" y2="8"></line>
             </svg>
-            <span>Static interface preview. Live typing engine, metrics calculation, and arcade sound feedback activate in Phase 2.</span>
+            <span id="disclaimer-text">Select difficulty and duration, then click "Start Typing" to launch the live engine.</span>
           </p>
         </section>
+
+        <!-- Results Modal Dialog -->
+        <div class="results-modal-backdrop is-hidden" id="results-modal" role="dialog" aria-modal="true" aria-labelledby="results-title">
+          <div class="results-modal-card">
+            <div class="results-header">
+              <div class="badge-pill">
+                <span class="badge-indicator"></span>
+                <span id="results-badge-text">TEST COMPLETED</span>
+              </div>
+              <h2 id="results-title" class="results-headline">Performance Summary</h2>
+              <p class="results-sub" id="results-sub">Clean keystrokes verified with arcade telemetry.</p>
+            </div>
+
+            <div class="results-stats-grid">
+              <div class="result-stat-box primary">
+                <span class="result-stat-label">SPEED</span>
+                <div class="result-stat-value"><span id="result-final-wpm">0</span> <small>WPM</small></div>
+                <span class="result-stat-note">Net words per minute</span>
+              </div>
+              <div class="result-stat-box primary">
+                <span class="result-stat-label">ACCURACY</span>
+                <div class="result-stat-value"><span id="result-final-accuracy">0</span><small>%</small></div>
+                <span class="result-stat-note">Keystroke precision</span>
+              </div>
+              <div class="result-stat-box">
+                <span class="result-stat-label">CHARACTERS</span>
+                <div class="result-stat-value"><span id="result-final-chars">0</span></div>
+                <span class="result-stat-note"><span class="text-accent" id="result-final-correct">0</span> correct • <span class="text-error" id="result-final-incorrect">0</span> errors</span>
+              </div>
+              <div class="result-stat-box">
+                <span class="result-stat-label">TIME</span>
+                <div class="result-stat-value"><span id="result-final-time">0s</span></div>
+                <span class="result-stat-note" id="result-final-difficulty">Medium Difficulty</span>
+              </div>
+            </div>
+
+            <div class="results-actions">
+              <button type="button" class="btn-start btn-results-retry" id="btn-results-retry">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M23 4v6h-6"></path>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                <span>Try Again (Esc)</span>
+              </button>
+              <button type="button" class="btn-secondary btn-results-config" id="btn-results-config">
+                Configure Test
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- Informational / Feature Pillars (Lightweight arcade cards) -->
         <section class="features-grid" aria-label="Core features">
