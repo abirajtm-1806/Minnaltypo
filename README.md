@@ -1,2 +1,3 @@
 # Minnaltypo
-Improve your typing like KSRTC Minnal
+Improve your typing speed like KSRTC Minnal
+edakk vazhi kidakka allel crct timiletha
