@@ -218,7 +218,7 @@
 
             <!-- Monospace Character Render Area -->
             <div class="monospace-sample" id="sample-paragraph" aria-live="polite">
-              Speed is a byproduct of precision and rhythm. When fingers glide across the keys with quiet confidence, words form seamlessly on the screen. True typing mastery is not about rushing—it is about striking each key cleanly, maintaining steady momentum, and letting practice sharpen your natural reflexes into lightning speed.
+              Speed is a byproduct of precision and rhythm. When fingers glide across the keys with quiet confidence, words form seamlessly on the screen. True typing mastery is not about rushing; it is about striking each key cleanly, maintaining steady momentum, and letting practice sharpen your natural reflexes into lightning speed.
             </div>
           </div>
 
@@ -277,55 +277,139 @@
           </p>
         </section>
 
-        <!-- Results Modal Dialog -->
-        <div class="results-modal-backdrop is-hidden" id="results-modal" role="dialog" aria-modal="true" aria-labelledby="results-title">
-          <div class="results-modal-card">
-            <div class="results-header">
-              <div class="badge-pill">
-                <span class="badge-indicator"></span>
-                <span id="results-badge-text">TEST COMPLETED</span>
+        <!-- ============================================================= -->
+        <!-- RESULTS DASHBOARD (PHASE 3)                                   -->
+        <!-- ============================================================= -->
+        <section class="results-dashboard is-hidden" id="results-dashboard" aria-label="Typing test performance dashboard">
+          <div class="results-card">
+
+            <!-- Dashboard Header Row -->
+            <div class="results-header-row">
+              <div class="results-badges">
+                <div class="badge-pill" id="results-completion-badge">
+                  <span class="badge-indicator"></span>
+                  <span id="results-badge-text">TEST COMPLETED</span>
+                </div>
+                <div class="tier-badge tier-excellent" id="results-tier-badge">
+                  <span class="tier-dot"></span>
+                  <span id="results-tier-name">EXCELLENT</span>
+                </div>
               </div>
-              <h2 id="results-title" class="results-headline">Performance Summary</h2>
-              <p class="results-sub" id="results-sub">Clean keystrokes verified with arcade telemetry.</p>
+              <div class="results-meta-pill" id="results-meta-pill">
+                <span id="results-meta-diff">Medium Difficulty</span> • <span id="results-meta-duration">60s Limit</span>
+              </div>
             </div>
 
+            <!-- Headline & Encouraging Performance Feedback (Section 5) -->
+            <div class="results-hero-header">
+              <h2 id="results-headline" class="results-hero-title">Performance Summary</h2>
+              <p id="results-feedback-msg" class="results-feedback-text">
+                Lightning fast! Outstanding typing speed and fluid keystroke reflexes.
+              </p>
+            </div>
+
+            <!-- Hero Metrics Grid (Net WPM & Accuracy) -->
+            <div class="results-hero-metrics">
+              <!-- Primary Net WPM -->
+              <div class="hero-metric-box metric-wpm">
+                <span class="hero-metric-label">NET TYPING SPEED</span>
+                <div class="hero-metric-main">
+                  <span class="hero-metric-num" id="result-final-wpm">0</span>
+                  <span class="hero-metric-unit">WPM</span>
+                </div>
+                <div class="hero-metric-sub">
+                  <span>Gross Speed: <strong id="result-raw-wpm">0 WPM</strong></span>
+                </div>
+              </div>
+
+              <!-- Primary Accuracy -->
+              <div class="hero-metric-box metric-accuracy" id="hero-accuracy-box">
+                <span class="hero-metric-label">KEYSTROKE ACCURACY</span>
+                <div class="hero-metric-main">
+                  <span class="hero-metric-num" id="result-final-accuracy">100</span>
+                  <span class="hero-metric-unit">%</span>
+                </div>
+                <div class="hero-metric-sub">
+                  <span id="result-accuracy-sub">High precision</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detailed Telemetry Grid (6 Clean Statistics Cards) -->
             <div class="results-stats-grid">
-              <div class="result-stat-box primary">
-                <span class="result-stat-label">SPEED</span>
-                <div class="result-stat-value"><span id="result-final-wpm">0</span> <small>WPM</small></div>
-                <span class="result-stat-note">Net words per minute</span>
+              <!-- Card 1: Raw WPM -->
+              <div class="result-stat-box">
+                <span class="result-stat-label">RAW SPEED</span>
+                <div class="result-stat-value"><span id="detail-raw-wpm">0</span> <small>WPM</small></div>
+                <span class="result-stat-note">Gross speed before errors</span>
               </div>
-              <div class="result-stat-box primary">
-                <span class="result-stat-label">ACCURACY</span>
-                <div class="result-stat-value"><span id="result-final-accuracy">0</span><small>%</small></div>
-                <span class="result-stat-note">Keystroke precision</span>
+
+              <!-- Card 2: Consistency -->
+              <div class="result-stat-box">
+                <span class="result-stat-label">CONSISTENCY</span>
+                <div class="result-stat-value"><span id="detail-consistency">—</span></div>
+                <span class="result-stat-note" id="detail-consistency-sub">Sampled every 5s</span>
               </div>
+
+              <!-- Card 3: Characters Breakdown -->
               <div class="result-stat-box">
                 <span class="result-stat-label">CHARACTERS</span>
-                <div class="result-stat-value"><span id="result-final-chars">0</span></div>
-                <span class="result-stat-note"><span class="text-accent" id="result-final-correct">0</span> correct • <span class="text-error" id="result-final-incorrect">0</span> errors</span>
+                <div class="result-stat-value"><span id="detail-characters">0</span></div>
+                <span class="result-stat-note"><span class="text-accent" id="detail-chars-correct">0</span> correct • <span class="text-error" id="detail-chars-incorrect">0</span> wrong</span>
               </div>
+
+              <!-- Card 4: Total Keystrokes & Errors -->
               <div class="result-stat-box">
-                <span class="result-stat-label">TIME</span>
-                <div class="result-stat-value"><span id="result-final-time">0s</span></div>
-                <span class="result-stat-note" id="result-final-difficulty">Medium Difficulty</span>
+                <span class="result-stat-label">KEYSTROKES</span>
+                <div class="result-stat-value"><span id="detail-keystrokes">0</span></div>
+                <span class="result-stat-note"><span class="text-error" id="detail-mistakes-count">0</span> error keys • <span id="detail-backspaces-count">0</span> fixes</span>
+              </div>
+
+              <!-- Card 5: Words Completed -->
+              <div class="result-stat-box">
+                <span class="result-stat-label">WORDS COMPLETED</span>
+                <div class="result-stat-value"><span id="detail-words-completed">0</span></div>
+                <span class="result-stat-note">Standard 5 chars/word</span>
+              </div>
+
+              <!-- Card 6: Actual Time Taken -->
+              <div class="result-stat-box">
+                <span class="result-stat-label">TIME ELAPSED</span>
+                <div class="result-stat-value"><span id="detail-time-taken">0s</span></div>
+                <span class="result-stat-note" id="detail-time-target">Selected: 60s limit</span>
               </div>
             </div>
 
-            <div class="results-actions">
-              <button type="button" class="btn-start btn-results-retry" id="btn-results-retry">
+            <!-- Action Buttons Bar (Section 6) -->
+            <div class="results-actions-bar">
+              <button type="button" class="btn-start btn-results-action" id="btn-results-retry" title="Restart with the same paragraph (Esc)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M23 4v6h-6"></path>
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                 </svg>
-                <span>Try Again (Esc)</span>
+                <span>Try Again</span>
               </button>
-              <button type="button" class="btn-secondary btn-results-config" id="btn-results-config">
-                Configure Test
+
+              <button type="button" class="btn-secondary btn-results-action" id="btn-results-new-para" title="Generate another paragraph">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                <span>New Paragraph</span>
+              </button>
+
+              <button type="button" class="btn-secondary btn-results-action" id="btn-results-home" title="Return to home screen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>Home</span>
               </button>
             </div>
+
           </div>
-        </div>
+        </section>
 
         <!-- Informational / Feature Pillars (Lightweight arcade cards) -->
         <section class="features-grid" aria-label="Core features">

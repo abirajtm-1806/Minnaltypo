@@ -1,23 +1,15 @@
 /**
  * ============================================================================
- * MINNALTYPING — PHASE 2 TYPING ENGINE
- * Pure Vanilla JavaScript Foundation & Real-Time Keystroke Engine
+ * MINNALTYPING — PHASE 3: PERFORMANCE ENGINE & RESULTS DASHBOARD
+ * Pure Vanilla JavaScript Foundation, Precision Telemetry & Analytics
  *
- * Capabilities:
- * 1. 24-Paragraph Bank across Easy, Medium, and Hard tiers.
- * 2. Non-repeating random selection on test start.
- * 3. Seamless transition between setup view and active test HUD.
- * 4. Dual-mode input: transparent accessible textarea for physical desktop
- *    keyboards and mobile touchscreen keyboards.
- * 5. Character-by-character real-time matching:
- *    - Correct: Green (#B7F75B)
- *    - Incorrect: Red (#FF5B65)
- *    - Untyped: Muted grey (#858D9B)
- *    - Real-time blinking cursor indicator
- *    - Full handling of letters (upper/lowercase), spaces, punctuation, numbers, and backspace.
- * 6. Live progress bar and 4-metric character telemetry.
- * 7. Live countdown timer connected to 15s, 30s, 60s, and 120s selectors.
- * 8. Performance summary results dialog with instant restart.
+ * Core Capabilities:
+ * 1. Precision WPM & Raw WPM calculation using actual elapsed time.
+ * 2. Keystroke telemetry & historical error tracking (corrections do not erase errors).
+ * 3. 5-second interval consistency calculation (Coefficient of Variation).
+ * 4. Comprehensive Results Dashboard with 5-tier performance rating.
+ * 5. Dedicated action handlers: Try Again, New Paragraph, Home.
+ * 6. Bulletproof data integrity: zero division protection, duplicate finish guards.
  * ============================================================================
  */
 
@@ -33,14 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
       'Reading books is one of the best ways to learn new things and explore new places. When you open a good book, your mind can travel anywhere without leaving your favorite chair. Make it a daily habit to read a few pages.',
       'Hard work and patience always lead to great results over time. You do not need to be the fastest person to win the race. Keep taking small steps forward every day and you will reach your goals before you know it.',
       'A cup of warm tea on a rainy afternoon can make you feel cozy and calm. Listen to the drops of rain falling against the glass window as you relax and enjoy the quiet time with your family.',
-      'Simple habits can change your life for the better. Drink plenty of fresh water, smile often, and treat everyone with kindness. Small acts of care can brighten someone else day and bring joy to your own heart.',
+      'Simple habits can change your life for the better. Drink plenty of fresh water, smile often, and treat everyone with kindness. Small acts of care can brighten someone else\'s day and bring joy to your own heart.',
       'Music has the power to bring people together from all around the world. A simple melody can lift your mood and make you want to dance. Play your favorite tune whenever you need a quick boost of energy.',
       'Taking care of plants in a home garden teaches us how to be patient. Give them clean water, fresh air, and warm sunlight every day. In time, small seeds will grow into strong and colorful flowers.',
       'Typing fast is a fun skill that gets easier with steady practice. Keep your fingers light on the keys and look straight at the screen. You will notice yourself improving every single time you sit down to type.'
     ],
 
     medium: [
-      'Speed is a byproduct of precision and rhythm. When fingers glide across the keys with quiet confidence, words form seamlessly on the screen. True typing mastery is not about rushing—it is about striking each key cleanly, maintaining steady momentum, and letting practice sharpen your natural reflexes into lightning speed.',
+      'Speed is a byproduct of precision and rhythm. When fingers glide across the keys with quiet confidence, words form seamlessly on the screen. True typing mastery is not about rushing; it is about striking each key cleanly, maintaining steady momentum, and letting practice sharpen your natural reflexes into lightning speed.',
       'Modern computing has fundamentally transformed the way humans communicate, collaborate, and solve complex problems. From distributed networks to pocket-sized processors, technology enables instant access to global knowledge, bridging cultural gaps and empowering creators everywhere.',
       'Deep focus is a rare and valuable asset in an era characterized by relentless digital distractions. Those who master the discipline of sustained attention cultivate greater creativity, achieve higher cognitive output, and produce work of enduring craftsmanship.',
       'The architectural elegance of a software system depends heavily on simplicity, modularity, and thoughtful design. When developers resist unnecessary complexity and adhere to clean abstractions, their code remains maintainable, robust, and adaptable for years to come.',
@@ -52,11 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     hard: [
       'Algorithmic efficiency mirrors cognitive dexterity; keystrokes executing at 120+ WPM necessitate synchronization, instantaneous phonetic parsing, and unyielding discipline under strict latency constraints.',
-      'Quantum computing paradigm shifts—leveraging quantum superposition, entanglement, and decoherence mitigation—challenge cryptographic conventions (such as 2048-bit RSA) while precipitating novel architectures for combinatorial optimization.',
+      'Quantum computing paradigm shifts, leveraging quantum superposition, entanglement, and decoherence mitigation, challenge cryptographic conventions (such as 2048-bit RSA) while precipitating novel architectures for combinatorial optimization.',
       'Epistemological inquiries regarding artificial intelligence often conflate synthetic pattern recognition with genuine subjective consciousness; phenomenological qualia remain stubbornly enigmatic despite recursive neural hyper-parameter optimization.',
       'The socio-economic implications of distributed ledger protocols (e.g., zero-knowledge rollups, Byzantine fault-tolerant consensus mechanisms) disrupt legacy financial intermediation by replacing bureaucratic trust with deterministic mathematical verification.',
       'Biochemical homeostasis within eukaryotic organisms relies on delicate feedback cascades: allosteric enzymatic modulation, transmembrane electrochemical gradients, and mitochondrial ATP synthesis functioning at thermodynamic equilibrium thresholds.',
-      'Metacognitive calibration—the nuanced appraisal of one\'s own epistemic boundaries—distinguishes superficial erudition from profound intellectual rigour; dogmatism invariably falters when confronted with empirical counter-examples.',
+      'Metacognitive calibration, the nuanced appraisal of one\'s own epistemic boundaries, distinguishes superficial erudition from profound intellectual rigour; dogmatism invariably falters when confronted with empirical counter-examples.',
       'Microarchitectural vulnerabilities, including out-of-order execution side-channel leaks (CVE-2017-5753 and Spectre-v2 variants), demonstrated that hardware abstraction barriers could be surreptitiously bypassed via precise cache timing measurements.',
       'Atmospheric thermodynamic simulations integrate non-linear Navier-Stokes differential equations across multi-resolution geospatial grids; predictive accuracy diminishes exponentially as chaotic turbulence introduces sensitive initial-condition divergence.'
     ]
@@ -77,27 +69,40 @@ document.addEventListener('DOMContentLoaded', () => {
     duration: 60,
     soundEnabled: true,
 
-    // Engine runtime state
+    // Runtime state
     status: 'idle', // 'idle' | 'ready' | 'running' | 'finished'
+    isFinishing: false,
     targetText: '',
     timeRemaining: 60,
     timerInterval: null,
     startTime: null,
     elapsedSeconds: 0,
+    prevTypedLength: 0,
 
-    // Keystroke telemetry
-    typedCount: 0,
-    correctCount: 0,
-    incorrectCount: 0,
-    grossWPM: 0,
+    // Keystroke telemetry (Section 1 & 2)
+    typedCount: 0,            // Total characters currently typed
+    correctCount: 0,          // Current correct characters
+    incorrectCount: 0,        // Current incorrect characters
+    totalKeystrokes: 0,       // All keystrokes including backspaces
+    correctKeystrokes: 0,     // Total matching character keystrokes
+    incorrectKeystrokes: 0,   // Historical mistakes (never erased by backspace!)
+    backspaceCount: 0,        // Total backspaces pressed
+
+    // Metrics
     netWPM: 0,
-    accuracy: 100
+    rawWPM: 0,
+    accuracy: 100,
+
+    // Consistency Sampling (Section 3)
+    wpmSamples: [],
+    lastSampleSecond: 0,
+    lastSampleCorrectChars: 0
   };
 
   // --------------------------------------------------------------------------
   // 3. DOM ELEMENT REFERENCES
   // --------------------------------------------------------------------------
-  // Setup & Layout Controls
+  // Setup & Layout Sections
   const welcomeSection = document.getElementById('welcome-section');
   const controlsSection = document.getElementById('controls-section');
   const featuresGrid = document.querySelector('.features-grid');
@@ -145,20 +150,39 @@ document.addEventListener('DOMContentLoaded', () => {
   const statAccTag = document.getElementById('stat-acc-tag');
   const statTimeTag = document.getElementById('stat-time-tag');
 
-  // Results Modal
-  const resultsModal = document.getElementById('results-modal');
-  const resultsTitle = document.getElementById('results-title');
-  const resultsSub = document.getElementById('results-sub');
+  // Results Dashboard Elements (Section 4)
+  const resultsDashboard = document.getElementById('results-dashboard');
   const resultsBadgeText = document.getElementById('results-badge-text');
+  const resultsTierBadge = document.getElementById('results-tier-badge');
+  const resultsTierName = document.getElementById('results-tier-name');
+  const resultsMetaDiff = document.getElementById('results-meta-diff');
+  const resultsMetaDuration = document.getElementById('results-meta-duration');
+  const resultsFeedbackMsg = document.getElementById('results-feedback-msg');
+
+  // Results Hero Metrics
   const resultFinalWpm = document.getElementById('result-final-wpm');
+  const resultRawWpm = document.getElementById('result-raw-wpm');
   const resultFinalAccuracy = document.getElementById('result-final-accuracy');
-  const resultFinalChars = document.getElementById('result-final-chars');
-  const resultFinalCorrect = document.getElementById('result-final-correct');
-  const resultFinalIncorrect = document.getElementById('result-final-incorrect');
-  const resultFinalTime = document.getElementById('result-final-time');
-  const resultFinalDifficulty = document.getElementById('result-final-difficulty');
+  const heroAccuracyBox = document.getElementById('hero-accuracy-box');
+
+  // Results Details Grid
+  const detailRawWpm = document.getElementById('detail-raw-wpm');
+  const detailConsistency = document.getElementById('detail-consistency');
+  const detailConsistencySub = document.getElementById('detail-consistency-sub');
+  const detailCharacters = document.getElementById('detail-characters');
+  const detailCharsCorrect = document.getElementById('detail-chars-correct');
+  const detailCharsIncorrect = document.getElementById('detail-chars-incorrect');
+  const detailKeystrokes = document.getElementById('detail-keystrokes');
+  const detailMistakesCount = document.getElementById('detail-mistakes-count');
+  const detailBackspacesCount = document.getElementById('detail-backspaces-count');
+  const detailWordsCompleted = document.getElementById('detail-words-completed');
+  const detailTimeTaken = document.getElementById('detail-time-taken');
+  const detailTimeTarget = document.getElementById('detail-time-target');
+
+  // Results Action Buttons (Section 6)
   const btnResultsRetry = document.getElementById('btn-results-retry');
-  const btnResultsConfig = document.getElementById('btn-results-config');
+  const btnResultsNewPara = document.getElementById('btn-results-new-para');
+  const btnResultsHome = document.getElementById('btn-results-home');
 
   // Modals & Navigation
   const soundToggleBtn = document.getElementById('sound-toggle');
@@ -180,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const navLinks = document.querySelectorAll('.nav-link');
 
   // --------------------------------------------------------------------------
-  // 4. PARAGRAPH SELECTION LOGIC (Section 1)
+  // 4. PARAGRAPH SELECTION LOGIC
   // --------------------------------------------------------------------------
   function getRandomParagraph(difficulty) {
     const list = PARAGRAPH_BANK[difficulty] || PARAGRAPH_BANK.medium;
@@ -200,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 5. PARAGRAPH RENDERING AS CHARACTER SPANS (Section 3)
+  // 5. PARAGRAPH RENDERING (With Natural Word Wrapping)
   // --------------------------------------------------------------------------
   function renderParagraphChars(text) {
     if (!sampleParagraph) return;
@@ -214,12 +238,13 @@ document.addEventListener('DOMContentLoaded', () => {
       span.className = 'char untyped';
       span.dataset.index = String(i);
 
+      // Preserve spaces for natural wrapping across lines
       span.textContent = char;
       if (char === ' ') {
         span.classList.add('char-space');
       }
 
-      // First character gets active cursor
+      // First character gets cursor
       if (i === 0) {
         span.classList.add('current');
       }
@@ -256,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Difficulty Selector Buttons
+  // Difficulty Selectors
   difficultyButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       difficultyButtons.forEach((b) => {
@@ -272,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Timer Selector Buttons (15s, 30s, 60s, 120s)
+  // Timer Selectors (15s, 30s, 60s, 120s)
   timerButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       timerButtons.forEach((b) => {
@@ -291,51 +316,72 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --------------------------------------------------------------------------
-  // 7. TEST TRANSITION ENGINE (Section 2)
+  // 7. TEST TRANSITION ENGINE
   // --------------------------------------------------------------------------
-  function startTypingSession() {
-    // 1. Transition away from welcome screen and controls card
+  function startTypingSession(options = {}) {
+    const reuseParagraph = options.newParagraph === false;
+
+    // 1. Reset data integrity guards
+    appState.isFinishing = false;
+    clearInterval(appState.timerInterval);
+    appState.timerInterval = null;
+
+    // 2. Hide welcome, controls, and results dashboard
     if (welcomeSection) welcomeSection.classList.add('is-hidden');
     if (controlsSection) controlsSection.classList.add('is-hidden');
     if (featuresGrid) featuresGrid.classList.add('is-hidden');
+    if (resultsDashboard) resultsDashboard.classList.add('is-hidden');
 
-    // 2. Reveal HUD, progress bar, and character telemetry
+    // 3. Reveal HUD, progress bar, character telemetry, and canvas
     if (testHud) testHud.classList.remove('is-hidden');
+    if (previewSection) previewSection.classList.remove('is-hidden');
     if (testProgressContainer) testProgressContainer.classList.remove('is-hidden');
     if (characterTelemetry) characterTelemetry.classList.remove('is-hidden');
     if (canvasFocusOverlay) canvasFocusOverlay.classList.add('is-hidden');
     if (typingCanvas) typingCanvas.classList.add('is-active');
 
-    // 3. Update preview header to active state
+    // 4. Update preview header
     if (previewHeading) previewHeading.textContent = 'Active Typing Session';
     if (previewStatusDesc) previewStatusDesc.textContent = 'Session:';
     if (statusIndicatorDot) statusIndicatorDot.style.backgroundColor = 'var(--color-accent)';
 
-    // 4. Update tags on stats bar
+    // 5. Update stat tags
     if (statWpmTag) statWpmTag.textContent = 'LIVE';
     if (statAccTag) statAccTag.textContent = 'LIVE';
     if (statTimeTag) statTimeTag.textContent = 'REMAINING';
-    if (disclaimerText) disclaimerText.textContent = 'Test in progress. Press Esc or click Restart to reset with a new paragraph.';
+    if (disclaimerText) disclaimerText.textContent = 'Test in progress. Press Esc to restart, or click Home to return.';
 
-    // 5. Select random non-repeating paragraph
-    appState.targetText = getRandomParagraph(appState.difficulty);
+    // 6. Select or reuse paragraph
+    if (!reuseParagraph || !appState.targetText) {
+      appState.targetText = getRandomParagraph(appState.difficulty);
+    }
     renderParagraphChars(appState.targetText);
 
-    // 6. Reset telemetry and runtime state
-    clearInterval(appState.timerInterval);
-    appState.timerInterval = null;
+    // 7. Reset telemetry and runtime state (Section 7: Data Integrity)
     appState.startTime = null;
     appState.elapsedSeconds = 0;
     appState.timeRemaining = appState.duration;
+    appState.prevTypedLength = 0;
+
     appState.typedCount = 0;
     appState.correctCount = 0;
     appState.incorrectCount = 0;
-    appState.grossWPM = 0;
-    appState.netWPM = 0;
-    appState.accuracy = 100;
-    appState.status = 'ready'; // Ready to type; timer begins on first key
+    appState.totalKeystrokes = 0;
+    appState.correctKeystrokes = 0;
+    appState.incorrectKeystrokes = 0;
+    appState.backspaceCount = 0;
 
-    // 7. Reset telemetry DOM displays
+    appState.netWPM = 0;
+    appState.rawWPM = 0;
+    appState.accuracy = 100;
+
+    appState.wpmSamples = [];
+    appState.lastSampleSecond = 0;
+    appState.lastSampleCorrectChars = 0;
+
+    appState.status = 'ready'; // Ready to type; countdown begins on first keystroke
+
+    // 8. Reset UI displays
     updateTelemetryDisplay();
     if (previewWpm) previewWpm.textContent = '0';
     if (previewAccuracy) previewAccuracy.textContent = '100%';
@@ -344,14 +390,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (progressBarFill) progressBarFill.style.width = '0%';
     if (progressBarVal) progressBarVal.textContent = '0%';
 
-    // 8. Enable, clear, and focus input area
+    // 9. Enable, clear, and focus input area
     if (typingInput) {
       typingInput.disabled = false;
       typingInput.value = '';
       typingInput.focus();
     }
 
-    // 9. Smooth scroll to canvas
+    // 10. Scroll smoothly to canvas
     if (previewSection) {
       previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -362,16 +408,18 @@ document.addEventListener('DOMContentLoaded', () => {
     clearInterval(appState.timerInterval);
     appState.timerInterval = null;
     appState.status = 'idle';
+    appState.isFinishing = false;
 
     if (welcomeSection) welcomeSection.classList.remove('is-hidden');
     if (controlsSection) controlsSection.classList.remove('is-hidden');
     if (featuresGrid) featuresGrid.classList.remove('is-hidden');
+    if (previewSection) previewSection.classList.remove('is-hidden');
 
     if (testHud) testHud.classList.add('is-hidden');
     if (testProgressContainer) testProgressContainer.classList.add('is-hidden');
     if (characterTelemetry) characterTelemetry.classList.add('is-hidden');
     if (canvasFocusOverlay) canvasFocusOverlay.classList.add('is-hidden');
-    if (resultsModal) resultsModal.classList.add('is-hidden');
+    if (resultsDashboard) resultsDashboard.classList.add('is-hidden');
     if (typingCanvas) typingCanvas.classList.remove('is-active');
 
     if (previewHeading) previewHeading.textContent = 'Preview Canvas';
@@ -391,10 +439,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateConfigPreview();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // --------------------------------------------------------------------------
-  // 8. LIVE COUNTDOWN TIMER (Section 5)
+  // 8. LIVE COUNTDOWN TIMER & 5-SECOND CONSISTENCY SAMPLING (Section 3 & 5)
   // --------------------------------------------------------------------------
   function startCountdownTimer() {
     if (appState.timerInterval) return;
@@ -402,35 +451,71 @@ document.addEventListener('DOMContentLoaded', () => {
     appState.status = 'running';
     appState.startTime = performance.now();
     appState.timeRemaining = appState.duration;
+    appState.lastSampleSecond = 0;
+    appState.lastSampleCorrectChars = 0;
+    appState.wpmSamples = [];
 
     appState.timerInterval = setInterval(() => {
       appState.timeRemaining--;
-      appState.elapsedSeconds = appState.duration - appState.timeRemaining;
+      const elapsedSec = Math.max(0, (performance.now() - appState.startTime) / 1000);
+      appState.elapsedSeconds = elapsedSec;
+
+      // Collect consistency samples every 5 seconds (Section 3)
+      const wholeSec = Math.floor(elapsedSec);
+      if (wholeSec >= 5 && wholeSec % 5 === 0 && wholeSec !== appState.lastSampleSecond) {
+        appState.lastSampleSecond = wholeSec;
+        const charsDelta = Math.max(0, appState.correctCount - appState.lastSampleCorrectChars);
+        const sampleWPM = Math.max(0, Math.round((charsDelta / 5) / (5 / 60)));
+        appState.wpmSamples.push(sampleWPM);
+        appState.lastSampleCorrectChars = appState.correctCount;
+      }
 
       // Update timer displays
-      const timerStr = `${appState.timeRemaining}s`;
+      const timerStr = `${Math.max(0, appState.timeRemaining)}s`;
       if (hudTimerCountdown) hudTimerCountdown.textContent = timerStr;
       if (previewTime) previewTime.textContent = timerStr;
 
-      // Calculate live WPM during running timer
+      // Update live WPM telemetry
       calculateLiveWPM();
 
-      // Check if time expired
+      // Check timeout
       if (appState.timeRemaining <= 0) {
         clearInterval(appState.timerInterval);
         appState.timerInterval = null;
-        finishTypingSession(false); // Time expired
+        finishTypingSession(false); // Finished via timeout
       }
     }, 1000);
   }
 
   // --------------------------------------------------------------------------
-  // 9. CHARACTER-BY-CHARACTER MATCHING ENGINE (Section 3 & 4)
+  // 9. RESILIENT CHARACTER COMPARISON & TYPING ENGINE (Section 1, 2 & 3)
   // --------------------------------------------------------------------------
-  function handleTypingInput(e) {
-    if (appState.status === 'finished') return;
+  // Normalizes physical/virtual keyboard punctuation variations (quotes, hyphens, dashes)
+  function isCharMatch(typedChar, targetChar) {
+    if (typedChar === targetChar) return true;
 
-    // Start countdown timer on first keypress
+    // Hyphens, en-dashes, em-dashes
+    if ((typedChar === '-' || typedChar === '–' || typedChar === '—') &&
+        (targetChar === '-' || targetChar === '–' || targetChar === '—')) {
+      return true;
+    }
+    // Straight single quote, curly apostrophes, backticks
+    if ((typedChar === "'" || typedChar === '’' || typedChar === '‘' || typedChar === '`') &&
+        (targetChar === "'" || targetChar === '’' || targetChar === '‘' || targetChar === '`')) {
+      return true;
+    }
+    // Straight double quote, curly double quotes
+    if ((typedChar === '"' || typedChar === '“' || typedChar === '”') &&
+        (targetChar === '"' || targetChar === '“' || targetChar === '”')) {
+      return true;
+    }
+    return false;
+  }
+
+  function handleTypingInput(e) {
+    if (appState.status === 'finished' || appState.isFinishing) return;
+
+    // Start timer on first keystroke
     if (appState.status === 'ready') {
       startCountdownTimer();
     }
@@ -438,29 +523,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const target = appState.targetText;
     let typed = typingInput.value;
 
-    // Prevent typing beyond the target paragraph length (Section 3 restriction)
+    // Prevent typing beyond target paragraph length
     if (typed.length > target.length) {
       typed = typed.slice(0, target.length);
       typingInput.value = typed;
     }
 
-    const typedLen = typed.length;
+    const currentLen = typed.length;
+    const prevLen = appState.prevTypedLength;
+
+    // Keystroke telemetry & historical error tracking (Section 2)
+    // Correcting a mistake via Backspace does NOT erase the historical error count!
+    if (currentLen > prevLen) {
+      // Keystrokes were added
+      for (let k = prevLen; k < currentLen; k++) {
+        appState.totalKeystrokes++;
+        if (isCharMatch(typed[k], target[k])) {
+          appState.correctKeystrokes++;
+        } else {
+          appState.incorrectKeystrokes++; // Historical mistake recorded
+        }
+      }
+    } else if (currentLen < prevLen) {
+      // Backspace / deletion occurred
+      const deletedCount = prevLen - currentLen;
+      appState.backspaceCount += deletedCount;
+      appState.totalKeystrokes += deletedCount;
+    }
+    appState.prevTypedLength = currentLen;
+
     const targetLen = target.length;
     let correct = 0;
     let incorrect = 0;
 
     const charSpans = sampleParagraph.querySelectorAll('.char');
 
-    // Compare every typed character against target paragraph
+    // Update individual visual states
     for (let i = 0; i < targetLen; i++) {
       const span = charSpans[i];
       if (!span) continue;
 
       span.classList.remove('current', 'current-end');
 
-      if (i < typedLen) {
+      if (i < currentLen) {
         span.classList.remove('untyped');
-        if (typed[i] === target[i]) {
+        if (isCharMatch(typed[i], target[i])) {
           span.classList.add('correct');
           span.classList.remove('incorrect');
           correct++;
@@ -476,45 +583,48 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Position cursor / current-position indicator
-    if (typedLen < targetLen) {
-      const activeSpan = charSpans[typedLen];
+    // Update cursor / position indicator & auto-scroll to keep active cursor in view
+    if (currentLen < targetLen) {
+      const activeSpan = charSpans[currentLen];
       if (activeSpan) {
         activeSpan.classList.add('current');
+        if (typeof activeSpan.scrollIntoView === 'function') {
+          activeSpan.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+        }
       }
-    } else if (typedLen === targetLen && targetLen > 0) {
-      // Trailing cursor on the last character
+    } else if (currentLen === targetLen && targetLen > 0) {
       const lastSpan = charSpans[targetLen - 1];
       if (lastSpan) {
         lastSpan.classList.add('current-end');
+        if (typeof lastSpan.scrollIntoView === 'function') {
+          lastSpan.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+        }
       }
     }
 
-    // Update state numbers
-    appState.typedCount = typedLen;
+    // State numbers
+    appState.typedCount = currentLen;
     appState.correctCount = correct;
     appState.incorrectCount = incorrect;
 
-    // Calculate real-time accuracy percentage
-    if (typedLen > 0) {
-      appState.accuracy = Math.max(0, Math.round((correct / typedLen) * 100));
-    } else {
-      appState.accuracy = 100;
-    }
+    // Accuracy formula: (Correct Keystrokes / Total Character Keystrokes) * 100
+    const totalAttempts = appState.correctKeystrokes + appState.incorrectKeystrokes;
+    appState.accuracy = totalAttempts > 0
+      ? Math.max(0, Math.min(100, (appState.correctKeystrokes / totalAttempts) * 100))
+      : 100;
 
-    // Update Progress Indicator & Character Telemetry (Section 4)
     updateProgressAndTelemetry();
     calculateLiveWPM();
 
-    // Check completion: finished whole paragraph before time ran out
-    if (typedLen === targetLen) {
+    // Check completion: entire paragraph finished before timer expired
+    if (currentLen === targetLen) {
       clearInterval(appState.timerInterval);
       appState.timerInterval = null;
       finishTypingSession(true); // Complete
     }
   }
 
-  // Update Live Telemetry & Progress Bar (Section 4)
+  // Update Telemetry & Progress
   function updateProgressAndTelemetry() {
     const total = appState.targetText.length;
     const typed = appState.typedCount;
@@ -523,18 +633,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const remaining = Math.max(0, total - typed);
     const percent = total > 0 ? Math.min(100, Math.round((typed / total) * 100)) : 0;
 
-    // Character telemetry counters
     if (counterTyped) counterTyped.textContent = String(typed);
     if (counterCorrect) counterCorrect.textContent = String(correct);
     if (counterIncorrect) counterIncorrect.textContent = String(incorrect);
     if (counterRemaining) counterRemaining.textContent = String(remaining);
 
-    // Progress bar
     if (progressBarFill) progressBarFill.style.width = `${percent}%`;
     if (progressBarVal) progressBarVal.textContent = `${percent}%`;
 
-    // Live accuracy display
-    if (previewAccuracy) previewAccuracy.textContent = `${appState.accuracy}%`;
+    const formattedAcc = appState.accuracy % 1 === 0 ? appState.accuracy.toFixed(0) : appState.accuracy.toFixed(1);
+    if (previewAccuracy) previewAccuracy.textContent = `${formattedAcc}%`;
   }
 
   function updateTelemetryDisplay() {
@@ -545,68 +653,202 @@ document.addEventListener('DOMContentLoaded', () => {
     if (counterRemaining) counterRemaining.textContent = String(total);
   }
 
-  // Calculate live WPM
+  // Calculate live WPM during test
   function calculateLiveWPM() {
-    const minutes = Math.max(0.016, appState.elapsedSeconds / 60); // min 1 second
-    const gross = Math.round((appState.typedCount / 5) / minutes);
-    const net = Math.max(0, Math.round((appState.correctCount / 5) / minutes));
+    const elapsedSec = appState.startTime ? Math.max(0.1, (performance.now() - appState.startTime) / 1000) : 0;
+    const elapsedMin = Math.max(0.016, elapsedSec / 60);
 
-    appState.grossWPM = isNaN(gross) ? 0 : gross;
-    appState.netWPM = isNaN(net) ? 0 : net;
+    const net = Math.max(0, Math.round((appState.correctCount / 5) / elapsedMin));
+    const gross = Math.max(0, Math.round((appState.typedCount / 5) / elapsedMin));
+
+    appState.netWPM = net;
+    appState.rawWPM = gross;
 
     if (previewWpm) previewWpm.textContent = String(appState.netWPM);
+    const formattedAcc = appState.accuracy % 1 === 0 ? appState.accuracy.toFixed(0) : appState.accuracy.toFixed(1);
+    if (previewAccuracy) previewAccuracy.textContent = `${formattedAcc}%`;
   }
 
   // --------------------------------------------------------------------------
-  // 10. SESSION FINISH & PERFORMANCE SUMMARY
+  // 10. CONSISTENCY & PERFORMANCE RATING HELPERS (Section 3 & 5)
+  // --------------------------------------------------------------------------
+  function calculateConsistency(samples) {
+    if (!samples || samples.length < 2) return null;
+
+    const n = samples.length;
+    const mean = samples.reduce((acc, v) => acc + v, 0) / n;
+    if (mean <= 0) return 0;
+
+    const variance = samples.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / n;
+    const stdDev = Math.sqrt(variance);
+    const cv = stdDev / mean;
+
+    // Consistency: 100% minus variation percentage
+    return Math.max(0, Math.min(100, Math.round((1 - cv) * 100)));
+  }
+
+  function getPerformanceRating(wpm) {
+    if (wpm < 20) {
+      return {
+        tier: 'Beginner',
+        className: 'tier-beginner',
+        feedback: 'Solid foundation! Consistent daily practice will build your muscle memory and speed.'
+      };
+    } else if (wpm <= 35) {
+      return {
+        tier: 'Improving',
+        className: 'tier-improving',
+        feedback: 'Steady progress! Your finger placement, rhythm, and keystroke confidence are developing well.'
+      };
+    } else if (wpm <= 50) {
+      return {
+        tier: 'Good',
+        className: 'tier-good',
+        feedback: 'Great rhythm! You are typing at an above-average pace with strong, dependable accuracy.'
+      };
+    } else if (wpm <= 70) {
+      return {
+        tier: 'Excellent',
+        className: 'tier-excellent',
+        feedback: 'Lightning fast! Outstanding typing speed and fluid keystroke reflexes.'
+      };
+    } else {
+      return {
+        tier: 'Advanced',
+        className: 'tier-advanced',
+        feedback: 'Masterclass performance! Elite typing speed with exceptional dexterity and focus.'
+      };
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 11. SESSION FINISH & RESULTS DASHBOARD (Section 4, 5, 7)
   // --------------------------------------------------------------------------
   function finishTypingSession(completedAll) {
+    // Prevent duplicate calculations (Section 7: Data Integrity)
+    if (appState.status === 'finished' || appState.isFinishing) return;
+    appState.isFinishing = true;
     appState.status = 'finished';
+
+    clearInterval(appState.timerInterval);
+    appState.timerInterval = null;
 
     if (typingInput) {
       typingInput.disabled = true;
     }
 
-    const elapsed = Math.max(1, appState.elapsedSeconds);
-    const minutes = elapsed / 60;
-    const finalWPM = Math.max(0, Math.round((appState.correctCount / 5) / minutes));
+    // Calculate actual elapsed time in seconds (Section 1 requirement)
+    const finalElapsedMs = appState.startTime ? Math.max(100, performance.now() - appState.startTime) : 100;
+    const actualElapsedSeconds = completedAll
+      ? Math.max(0.1, finalElapsedMs / 1000)
+      : appState.duration;
+
+    const actualElapsedMinutes = Math.max(0.0016, actualElapsedSeconds / 60);
+
+    // Net WPM: Correct Characters / (5 * Elapsed Minutes)
+    const finalNetWPM = Math.max(0, Math.round((appState.correctCount / 5) / actualElapsedMinutes));
+
+    // Raw WPM: Total Typed Characters / (5 * Elapsed Minutes)
+    const finalRawWPM = Math.max(0, Math.round((appState.typedCount / 5) / actualElapsedMinutes));
+
+    // Accuracy: (Correct Keystrokes / Total Keystroke Attempts) * 100
+    const totalAttempts = appState.correctKeystrokes + appState.incorrectKeystrokes;
+    const finalAccuracy = totalAttempts > 0
+      ? Math.max(0, Math.min(100, (appState.correctKeystrokes / totalAttempts) * 100))
+      : 100;
+    const formattedAccuracy = finalAccuracy % 1 === 0 ? finalAccuracy.toFixed(0) : finalAccuracy.toFixed(1);
+
+    // Words Completed (5 chars per standard word)
+    const wordsCompleted = Math.max(0, Math.round(appState.correctCount / 5));
+
+    // Consistency (Sampled every 5s)
+    const consistencyVal = calculateConsistency(appState.wpmSamples);
+
+    // Performance Rating (Section 5)
+    const rating = getPerformanceRating(finalNetWPM);
     const capDifficulty = appState.difficulty.charAt(0).toUpperCase() + appState.difficulty.slice(1);
 
-    // Populate Results Modal
-    if (resultFinalWpm) resultFinalWpm.textContent = String(finalWPM);
-    if (resultFinalAccuracy) resultFinalAccuracy.textContent = String(appState.accuracy);
-    if (resultFinalChars) resultFinalChars.textContent = String(appState.typedCount);
-    if (resultFinalCorrect) resultFinalCorrect.textContent = String(appState.correctCount);
-    if (resultFinalIncorrect) resultFinalIncorrect.textContent = String(appState.incorrectCount);
-    if (resultFinalTime) resultFinalTime.textContent = `${elapsed}s`;
-    if (resultFinalDifficulty) resultFinalDifficulty.textContent = `${capDifficulty} Difficulty • ${appState.duration}s Limit`;
+    // ------------------------------------------------------------------------
+    // Populate Results Dashboard DOM
+    // ------------------------------------------------------------------------
+    if (resultFinalWpm) resultFinalWpm.textContent = String(finalNetWPM);
+    if (resultRawWpm) resultRawWpm.textContent = `${finalRawWPM} WPM`;
+    if (resultFinalAccuracy) resultFinalAccuracy.textContent = formattedAccuracy;
 
+    // Accuracy coloration
+    if (heroAccuracyBox) {
+      if (finalAccuracy >= 90) {
+        heroAccuracyBox.classList.add('metric-wpm');
+      } else {
+        heroAccuracyBox.classList.remove('metric-wpm');
+      }
+    }
+
+    if (detailRawWpm) detailRawWpm.textContent = String(finalRawWPM);
+
+    // Consistency display (never fabricated - Section 3)
+    if (detailConsistency) {
+      if (consistencyVal !== null) {
+        detailConsistency.textContent = `${consistencyVal}%`;
+        if (detailConsistencySub) {
+          detailConsistencySub.textContent = `Based on ${appState.wpmSamples.length} samples (5s intervals)`;
+        }
+      } else {
+        detailConsistency.textContent = '—';
+        if (detailConsistencySub) {
+          detailConsistencySub.textContent = 'Requires ≥ 10s test';
+        }
+      }
+    }
+
+    // Characters breakdown
+    if (detailCharacters) detailCharacters.textContent = String(appState.typedCount);
+    if (detailCharsCorrect) detailCharsCorrect.textContent = String(appState.correctCount);
+    if (detailCharsIncorrect) detailCharsIncorrect.textContent = String(appState.incorrectCount);
+
+    // Keystrokes breakdown (includes mistakes and backspaces)
+    if (detailKeystrokes) detailKeystrokes.textContent = String(appState.totalKeystrokes);
+    if (detailMistakesCount) detailMistakesCount.textContent = String(appState.incorrectKeystrokes);
+    if (detailBackspacesCount) detailBackspacesCount.textContent = String(appState.backspaceCount);
+
+    // Words & Time
+    if (detailWordsCompleted) detailWordsCompleted.textContent = String(wordsCompleted);
+    if (detailTimeTaken) {
+      detailTimeTaken.textContent = completedAll
+        ? `${actualElapsedSeconds.toFixed(1)}s`
+        : `${appState.duration}s`;
+    }
+    if (detailTimeTarget) detailTimeTarget.textContent = `Selected: ${appState.duration}s limit`;
+
+    // Badges & Feedback
     if (resultsBadgeText) {
       resultsBadgeText.textContent = completedAll ? 'CHALLENGE COMPLETED' : 'TIME EXPIRED';
     }
-    if (resultsHeadline) {
-      resultsHeadline.textContent = completedAll ? 'Exceptional Speed!' : 'Session Complete';
+    if (resultsTierName) resultsTierName.textContent = rating.tier.toUpperCase();
+    if (resultsTierBadge) {
+      resultsTierBadge.className = `tier-badge ${rating.className}`;
     }
-    if (resultsSub) {
-      resultsSub.textContent = completedAll
-        ? 'All characters successfully cleared with arcade precision.'
-        : 'Time elapsed! Review your precision metrics and try again.';
-    }
+    if (resultsFeedbackMsg) resultsFeedbackMsg.textContent = rating.feedback;
+    if (resultsMetaDiff) resultsMetaDiff.textContent = `${capDifficulty} Difficulty`;
+    if (resultsMetaDuration) resultsMetaDuration.textContent = `${appState.duration}s Limit`;
 
-    // Display Results Modal
-    if (resultsModal) {
-      resultsModal.classList.remove('is-hidden');
+    // ------------------------------------------------------------------------
+    // Transition to Results Dashboard Screen (Section 4)
+    // ------------------------------------------------------------------------
+    if (testHud) testHud.classList.add('is-hidden');
+    if (previewSection) previewSection.classList.add('is-hidden');
+
+    if (resultsDashboard) {
+      resultsDashboard.classList.remove('is-hidden');
+      resultsDashboard.scrollIntoView({ behavior: 'smooth', block: 'start' });
       if (btnResultsRetry) btnResultsRetry.focus();
     }
   }
 
-  const resultsHeadline = document.getElementById('results-title');
-
   // --------------------------------------------------------------------------
-  // 11. FOCUS MANAGEMENT FOR DESKTOP & MOBILE TOUCHSCREEN KEYBOARDS
+  // 12. FOCUS MANAGEMENT FOR PHYSICAL & MOBILE KEYBOARDS
   // --------------------------------------------------------------------------
   if (typingCanvas && typingInput) {
-    // Tapping/clicking anywhere on the typing canvas focuses the hidden input
     typingCanvas.addEventListener('click', () => {
       if (appState.status === 'ready' || appState.status === 'running') {
         typingInput.focus();
@@ -614,10 +856,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Handle blur: show overlay so user knows they need to click back
     typingInput.addEventListener('blur', () => {
       if ((appState.status === 'ready' || appState.status === 'running') && canvasFocusOverlay) {
-        // Small delay to check if focus went to modal
         setTimeout(() => {
           if (document.activeElement !== typingInput && (appState.status === 'ready' || appState.status === 'running')) {
             canvasFocusOverlay.classList.remove('is-hidden');
@@ -632,7 +872,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Wire input event
     typingInput.addEventListener('input', handleTypingInput);
   }
 
@@ -644,41 +883,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 12. ACTION BUTTONS & SHORTCUTS
+  // 13. RESULTS ACTIONS & SHORTCUTS (Section 6)
   // --------------------------------------------------------------------------
-  // Start Button
-  if (startButton) {
-    startButton.addEventListener('click', () => {
-      startTypingSession();
+  // Try Again: Restart test with the SAME paragraph
+  if (btnResultsRetry) {
+    btnResultsRetry.addEventListener('click', () => {
+      startTypingSession({ newParagraph: false });
     });
   }
 
-  // Restart Button in HUD
-  if (btnHudRestart) {
-    btnHudRestart.addEventListener('click', () => {
-      startTypingSession();
+  // New Paragraph: Restart test with a NEW paragraph
+  if (btnResultsNewPara) {
+    btnResultsNewPara.addEventListener('click', () => {
+      startTypingSession({ newParagraph: true });
     });
   }
 
-  // Config Button in HUD
-  if (btnHudConfig) {
-    btnHudConfig.addEventListener('click', () => {
+  // Home: Return to homepage / configuration view
+  if (btnResultsHome) {
+    btnResultsHome.addEventListener('click', () => {
       exitToSetup();
     });
   }
 
-  // Results Retry Button
-  if (btnResultsRetry) {
-    btnResultsRetry.addEventListener('click', () => {
-      if (resultsModal) resultsModal.classList.add('is-hidden');
-      startTypingSession();
+  // Start Button from setup
+  if (startButton) {
+    startButton.addEventListener('click', () => {
+      startTypingSession({ newParagraph: true });
     });
   }
 
-  // Results Config Button
-  if (btnResultsConfig) {
-    btnResultsConfig.addEventListener('click', () => {
-      if (resultsModal) resultsModal.classList.add('is-hidden');
+  // HUD Restart Button (Esc)
+  if (btnHudRestart) {
+    btnHudRestart.addEventListener('click', () => {
+      startTypingSession({ newParagraph: true });
+    });
+  }
+
+  // HUD Config Button
+  if (btnHudConfig) {
+    btnHudConfig.addEventListener('click', () => {
       exitToSetup();
     });
   }
@@ -686,9 +930,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Keyboard Shortcuts: Escape to restart or close modals
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      if (resultsModal && !resultsModal.classList.contains('is-hidden')) {
-        resultsModal.classList.add('is-hidden');
-        startTypingSession();
+      if (resultsDashboard && !resultsDashboard.classList.contains('is-hidden')) {
+        startTypingSession({ newParagraph: false }); // Try again on Esc
         return;
       }
       if (settingsModal && !settingsModal.classList.contains('is-hidden')) {
@@ -700,13 +943,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       if (appState.status === 'running' || appState.status === 'ready') {
-        startTypingSession(); // Quick restart with new paragraph
+        startTypingSession({ newParagraph: true }); // Quick restart
       }
     }
   });
 
   // --------------------------------------------------------------------------
-  // 13. SOUND TOGGLE CONTROLS
+  // 14. SOUND TOGGLE CONTROLS
   // --------------------------------------------------------------------------
   if (soundToggleBtn && soundOnIcon && soundOffIcon) {
     soundToggleBtn.addEventListener('click', () => {
@@ -728,7 +971,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 14. NAVIGATION LINKS
+  // 15. NAVIGATION LINKS
   // --------------------------------------------------------------------------
   navLinks.forEach((link) => {
     link.addEventListener('click', (e) => {
@@ -739,13 +982,12 @@ document.addEventListener('DOMContentLoaded', () => {
         exitToSetup();
         navLinks.forEach((l) => l.classList.remove('is-active'));
         link.classList.add('is-active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
       if (targetId === '#practice') {
         e.preventDefault();
-        startTypingSession();
+        startTypingSession({ newParagraph: true });
         navLinks.forEach((l) => l.classList.remove('is-active'));
         link.classList.add('is-active');
         return;
@@ -762,8 +1004,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Footer About Link
+  if (footerAboutLink && aboutModal) {
+    footerAboutLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal(aboutModal);
+    });
+  }
+
   // --------------------------------------------------------------------------
-  // 15. SETTINGS & ABOUT MODALS
+  // 16. SETTINGS & ABOUT MODALS
   // --------------------------------------------------------------------------
   function openModal(modal) {
     if (!modal) return;
@@ -795,12 +1045,6 @@ document.addEventListener('DOMContentLoaded', () => {
       openModal(aboutModal);
     });
   }
-  if (footerAboutLink && aboutModal) {
-    footerAboutLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      openModal(aboutModal);
-    });
-  }
   if (aboutCloseBtn && aboutModal) {
     aboutCloseBtn.addEventListener('click', () => closeModal(aboutModal));
   }
@@ -808,27 +1052,22 @@ document.addEventListener('DOMContentLoaded', () => {
     aboutOkBtn.addEventListener('click', () => closeModal(aboutModal));
   }
 
-  [settingsModal, aboutModal, resultsModal].forEach((modal) => {
+  [settingsModal, aboutModal].forEach((modal) => {
     if (!modal) return;
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
-        if (modal === resultsModal) {
-          modal.classList.add('is-hidden');
-          startTypingSession();
-        } else {
-          closeModal(modal);
-        }
+        closeModal(modal);
       }
     });
   });
 
   // --------------------------------------------------------------------------
-  // 16. INITIALIZATION
+  // 17. INITIALIZATION
   // --------------------------------------------------------------------------
   updateConfigPreview();
 
   console.log(
-    '%c⚡ MINNALTYPING %c— Phase 2 Typing Engine Active (%d Paragraphs Ready)',
+    '%c⚡ MINNALTYPING %c— Phase 3 Performance Engine Active (%d Paragraphs Ready)',
     'background: #B7F75B; color: #10131B; font-weight: bold; padding: 2px 6px; border-radius: 3px;',
     'color: #F2F4F0; font-weight: 500;',
     PARAGRAPH_BANK.easy.length + PARAGRAPH_BANK.medium.length + PARAGRAPH_BANK.hard.length
